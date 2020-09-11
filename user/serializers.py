@@ -1,33 +1,21 @@
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 
-from .models import User, UserProfile
+from .models import User
 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UserProfile
-        fields = ('nickname',)
-
 class UserRegistrationSerializer(serializers.ModelSerializer):
     
-    profile = UserSerializer(required=False)
-
     class Meta:
         model = User
-        fields = ('email', 'password', 'profile')
+        fields = ('email', 'password', 'nickname')
         extra_kwargs = {"password": {"write_only":True}}
 
     def create(self, validated_data):
-        profile_data = validated_data.pop("profile")
         user = User.objects.create_user(**validated_data)
-        UserProfile.objects.create(
-            user=user,
-            nickname=profile_data['nickname']
-        )
+        
         return user
 
 JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER

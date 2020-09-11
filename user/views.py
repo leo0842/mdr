@@ -22,6 +22,7 @@ class UserRegistrationView(CreateAPIView):
             'success': "True",
             'status code': status_code,
             'message': "User registered successfully",
+            'nickname': serializer.data["nickname"],
         }
         return Response(response, status=status_code)
 

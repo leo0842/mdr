@@ -6,18 +6,19 @@ import uuid
 
 class UserManager(BaseUserManager):
 
-    def create_user(self, email, password=None):
+    def create_user(self, email, nickname, password=None):
         if not email:
             raise ValueError("Users Must Have an email address")
 
         user = self.model(
             email=self.normalize_email(email),
+            nickname=nickname,
         )
         user.set_password(password) ## hash 해서 저장
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, email, password, nickname):
         if password is None:
             raise TypeError("Superusers must have a password.")
 
@@ -39,9 +40,12 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-
+    nickname = models.CharField(
+        max_length=50,
+        unique=True,
+    )
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = [] ## USERNAME_FIELD와 password는 이미 required라서 넣을 필요 없음
+    REQUIRED_FIELDS = ['nickname',] ## USERNAME_FIELD와 password는 이미 required라서 넣을 필요 없음
 
     objects = UserManager()
 
@@ -50,12 +54,3 @@ class User(AbstractBaseUser):
 
     class Meta:
         db_table = "login"
-
-class UserProfile(models.Model):
-    objects = models.Manager()
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    nickname = models.CharField(max_length=50, unique=True)
-
-    class Meta:
-        db_table = "profile"
