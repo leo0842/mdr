@@ -1,6 +1,6 @@
 from django.db import models
 
-from user.models import User
+from user.models import User, UserManager
 
 # Create your models here.
 
@@ -14,6 +14,7 @@ class CommunityPost(models.Model):
     comment_count = models.IntegerField(default=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='cpost')
 
+    objects = UserManager()
     class Meta:
 
         db_table = "cpost"
