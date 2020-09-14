@@ -1,11 +1,11 @@
 from django.shortcuts import render
 
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListCreateAPIView
+from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
-from community.posting.serializers import CommunityPostSerializer
+from community.posting.serializers import CommunityPostSerializer, CommunityPostDetailSerializer
 from community.posting.models import CommunityPost
 from community.comment.serializers import CommentSerializer
 from community.comment.models import Comment
@@ -30,6 +30,13 @@ class CommunityPostPublishView(CreateAPIView):
             "json": serializer.data
         }
         return Response(response, status=status_code)
+
+class CommunityPostDetailView(RetrieveUpdateDestroyAPIView):
+
+    queryset = CommunityPost.objects.all()
+    lookup_url_kwarg = 'id' 
+    serializer_class = CommunityPostDetailSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
 class CommentView(ListCreateAPIView):
     queryset = Comment.objects.all()
