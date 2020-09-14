@@ -1,5 +1,4 @@
-my_settings.py
-secret.json
+.env
 __pycache__
 *.pyc
 *~
