@@ -49,3 +49,21 @@ class CommentView(ListCreateAPIView):
             "message": "Post published!"
         }
         return Response(response, status=status_code)
+
+class ReplyView(CommentView):
+    lookup_url_kwarg = ('cpost_id','comment_id')
+
+    def post(self, request, cpost_id, comment_id):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        cpost = CommunityPost.objects.get(id=cpost_id)
+        comment = Comment.objects.get(id=comment_id)
+        serializer.save(user=self.request.user, posts=cpost, parent=comment)
+        status_code = status.HTTP_201_CREATED
+        response = {
+            'success': "True",
+            "status code": status_code,
+            "message": "Post published!"
+        }
+        return Response(response, status=status_code)
+
