@@ -5,10 +5,10 @@ from rest_framework.generics import CreateAPIView, ListCreateAPIView, RetrieveUp
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 
-from community.posting.serializers import CommunityPostSerializer, CommunityPostDetailSerializer
-from community.posting.models import CommunityPost
-from community.comment.serializers import CommentSerializer
-from community.comment.models import Comment
+from community.cposting.serializers import CommunityPostSerializer, CommunityPostDetailSerializer
+from community.cposting.models import CommunityPost
+from community.ccomment.serializers import CommunityCommentSerializer
+from community.ccomment.models import CommunityComment
 from user.models import User
 
 # Create your views here.
@@ -38,9 +38,9 @@ class CommunityPostDetailView(RetrieveUpdateDestroyAPIView):
     serializer_class = CommunityPostDetailSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
 
-class CommentView(ListCreateAPIView):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+class CommunityCommentView(ListCreateAPIView):
+    queryset = CommunityComment.objects.all()
+    serializer_class = CommunityCommentSerializer
     permission_classes = (AllowAny,)
     lookup_url_kwarg = 'cpost_id'
 
@@ -57,14 +57,14 @@ class CommentView(ListCreateAPIView):
         }
         return Response(response, status=status_code)
 
-class ReplyView(CommentView):
+class CommunityReplyView(CommunityCommentView):
     lookup_url_kwarg = ('cpost_id','comment_id')
 
     def post(self, request, cpost_id, comment_id):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         cpost = CommunityPost.objects.get(id=cpost_id)
-        comment = Comment.objects.get(id=comment_id)
+        comment = CommunityComment.objects.get(id=comment_id)
         serializer.save(user=self.request.user, posts=cpost, parent=comment)
         status_code = status.HTTP_201_CREATED
         response = {
