@@ -46,9 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'user',
-    'community.posting',
-    'community.comment',
+    'community.cposting',
+    'community.ccomment',
     'corsheaders',
+    'lecture.lposting',
+    'lecture.lcomment',
 ]
 
 MIDDLEWARE = [
