@@ -92,10 +92,7 @@ WSGI_APPLICATION = 'mdr.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'mydatabase',
-    }
+    'default': env.db()
 }
 
 # Password validation

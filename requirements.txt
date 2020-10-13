@@ -12,6 +12,7 @@ isort==5.5.1
 lazy-object-proxy==1.4.3
 Markdown==3.2.2
 mccabe==0.6.1
+mysqlclient==2.0.1
 pycparser==2.20
 PyJWT==1.6.4
 pylint==2.6.0
