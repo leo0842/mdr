@@ -36,7 +36,7 @@ class CommunityPostDetailView(RetrieveUpdateDestroyAPIView):
     queryset = CommunityPost.objects.all()
     lookup_url_kwarg = 'id' 
     serializer_class = CommunityPostDetailSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (AllowAny,)
 
 class CommunityCommentView(ListCreateAPIView):
     queryset = CommunityComment.objects.all()
@@ -73,4 +73,3 @@ class CommunityReplyView(CommunityCommentView):
             "message": "Post published!"
         }
         return Response(response, status=status_code)
-

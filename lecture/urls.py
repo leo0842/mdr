@@ -1,6 +1,6 @@
 from django.conf.urls import url
 from django.urls import path, include
-from lecture.views import LecturePostDetailView, LecturePostPublishView, LectureCommentView, LectureReplyView
+from .views import LecturePostDetailView, LecturePostPublishView, LectureCommentView, LectureReplyView
 
 urlpatterns = [
     path('posts/', LecturePostPublishView.as_view()),
