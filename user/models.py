@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 import uuid
 
+from django.utils import timezone
 # Create your models here.
 
 class UserManager(BaseUserManager):
@@ -18,18 +19,19 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password, nickname):
+    def create_superuser(self, email, nickname, password):
         if password is None:
             raise TypeError("Superusers must have a password.")
 
-        user = self.create_user(email, password)
+        user = self.create_user(email, nickname, password)
         user.is_superuser = True
         user.is_staff = True
+        user.is_active = True
         user.save()
 
         return user
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) ## uuid는 범용 고유 식별자, uuid4는 version4
     email = models.EmailField(
@@ -37,9 +39,11 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     nickname = models.CharField(
         max_length=50,
         unique=True,
