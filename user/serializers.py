@@ -30,15 +30,21 @@ class UserLoginSerializer(serializers.Serializer):
     def validate(self, data):
         email = data.get("email", None)
         password = data.get("password", None)
+        print("email and password are ", email, password)
         user = authenticate(email=email, password=password)
+        print("this user is ", user)
         if user is None:
             raise serializers.ValidationError(
         "A user with this email and password is not found."
         )
         try:
+            print("typeofuser", type(user))
             payload = JWT_PAYLOAD_HANDLER(user)
+            payload['nickname'] = User.objects.get(email=user).nickname
+            print("payload: ",payload)
             jwt_token = JWT_ENCODE_HANDLER(payload)
             update_last_login(None, user)
+
         except User.DoesNotExist:
             raise serializers.ValidationError(
         "User with given email and password does not exists"
@@ -47,3 +53,36 @@ class UserLoginSerializer(serializers.Serializer):
             'email': user.email,
             'token': jwt_token
         }
+
+class UserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ('__all__')
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('id','nickname')
+
+class EmailVerificationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('__all__')
+class PasswordChangeSerializer(serializers.ModelSerializer):
+    Old_PW = serializers.CharField(required=True)
+    New_PW = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('id','Old_PW','New_PW')
+
+class KakaoSerializer(serializers.ModelSerializer):
+    client_id = serializers.CharField(required=True)
+    code =serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('client_id','code')
