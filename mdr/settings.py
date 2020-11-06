@@ -12,12 +12,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 import environ
+from datetime import timedelta
+from django.core.exceptions import ImproperlyConfigured
+
 env = environ.Env(
     DEBUG=(bool,True)
 )
 environ.Env.read_env()
 
-from django.core.exceptions import ImproperlyConfigured
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -43,14 +45,45 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+ 
+    # django-rest-auth
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_auth',
+    
+    # kakao
+    'allauth.socialaccount.providers.kakao',
+
+    # django-allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'rest_auth.registration',
+
+    # models
+    'home',
     'user',
     'community.cposting',
     'community.ccomment',
-    'corsheaders',
     'lecture.lposting',
     'lecture.lcomment',
+    
+    # cors
+    'corsheaders',
 ]
+
+SITE_ID = 1
+
+SOCIALACCOUNT_PROVIDERS = {
+    'kakao': {
+        'APP': {
+            'client_id': env("CLIENT_ID"),
+            'secret': env("SECRET"),
+            'key': ''
+        }
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -133,6 +166,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
@@ -144,7 +179,6 @@ REST_FRAMEWORK = {
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     )
 }
-from datetime import timedelta
 
 JWT_AUTH = {
   'JWT_ENCODE_HANDLER':
@@ -166,11 +200,19 @@ JWT_AUTH = {
   'JWT_VERIFY': True,
   'JWT_VERIFY_EXPIRATION': True,
   'JWT_LEEWAY': 0,
-  'JWT_EXPIRATION_DELTA': timedelta(days=30),
+  'JWT_EXPIRATION_DELTA': timedelta(hours=1),
   'JWT_AUDIENCE': None,
   'JWT_ISSUER': None,
   'JWT_ALLOW_REFRESH': False,
-  'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=30),
+  'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7),
   'JWT_AUTH_HEADER_PREFIX': 'Bearer',
   'JWT_AUTH_COOKIE': None,
 }
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
